@@ -1,0 +1,20 @@
+beeline
+!connect jdbc:hive2://
+
+set hive.exec.dynamic.partition.mode=nonstrict
+
+create table sales_particao(quantidade int, valortotal float)
+	PARTITIONED BY (estado char (2));
+
+INSERT OVERWRITE TABLE sales_particao PARTITION (estado)
+	SELECT quantidade, valortotal, estado from sales;
+
+create table sales_buck(quantidade int, valortotal float,
+	estado char(2))
+	clustered by (estado)
+	into 4 buckets;
+
+INSERT OVERWRITE TABLE sales_buck
+	SELECT quantidade, valortotal,
+	estado from sales;
+!quit
